@@ -1,0 +1,12 @@
+#Etapa 1: Build con Gradle 8.14.4 y JDK 21 (Build)
+FROM gradle:8.14.4-jdk21 AS build
+COPY --chown=gradle:gradle . /app
+WORKDIR /app
+RUN gradle bootJar --no-deamon
+
+#Etapa 2: Runtime con JDK 21 (Ejecucion)
+FROM eclipse-temurin:21-jdk
+WORKDIR /app
+COPY --from=build /app/build/libs/*.jar platzi_play.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-Dspring.profile.active=prod", "-jar", "platzi_play.jar"]
